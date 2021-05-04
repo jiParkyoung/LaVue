@@ -87,6 +87,6 @@ dat <- dat[,-which(names(dat) %in% c("SRMaxHourTime", "SRMaxHour", "evapnLargeSu
 # 결측치가 특정 기간 전에 측정되지 않은(기술의 문제로 추정) 변수 제거
 dat <- dat[,-which(names(dat) %in% c("windDir", "RHMinTime", "seaAPMaxTime", "seaAPMinTime", "SRSum", "cloudMidAvg"))]
 
-# 나머지 결측치가 있는 변수의 결측치를 mice로 대체
+# 나머지 결측치가 있는 변수의 결측치를 mice로 대체 -> 실행되는데 굉장한 시간이 소요
 mice_da <- mice(dat, method="rf")
 mice_dat <- complete(mice_da)
