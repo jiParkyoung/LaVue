@@ -90,3 +90,4 @@ dat <- dat[,-which(names(dat) %in% c("windDir", "RHMinTime", "seaAPMaxTime", "se
 # 나머지 결측치가 있는 변수의 결측치를 mice로 대체 -> 실행되는데 굉장한 시간이 소요
 mice_da <- mice(dat, method="rf")
 mice_dat <- complete(mice_da)
+sapply(mice_dat, function(x) sum(is.na(x)))
