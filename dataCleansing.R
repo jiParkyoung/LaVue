@@ -6,22 +6,22 @@ library(DMwR)
 library(randomForest)
 
 # 데이터 불러오기
-dat1 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\data\\OBS_ASOS_DD_1907_1909.csv")
-dat2 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\data\\OBS_ASOS_DD_1910_1919.csv")
-dat3 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\data\\OBS_ASOS_DD_1920_1929.csv")
-dat4 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\data\\OBS_ASOS_DD_1930_1939.csv")
-dat5 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\data\\OBS_ASOS_DD_1940_1949.csv")
-dat6 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\data\\OBS_ASOS_DD_1950_1959.csv")
-dat7 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\data\\OBS_ASOS_DD_1960_1969.csv")
-dat8 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\data\\OBS_ASOS_DD_1970_1979.csv")
-dat9 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\data\\OBS_ASOS_DD_1980_1984.csv")
-dat10 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\data\\OBS_ASOS_DD_1985_1989.csv")
-dat11 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\data\\OBS_ASOS_DD_1990_1994.csv")
-dat12 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\data\\OBS_ASOS_DD_1995_1999.csv")
-dat13 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\data\\OBS_ASOS_DD_2000_2004.csv")
-dat14 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\data\\OBS_ASOS_DD_2005_2009.csv")
-dat15 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\data\\OBS_ASOS_DD_2010_2014.csv")
-dat16 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\data\\OBS_ASOS_DD_2015_2021.csv")
+dat1 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\data\\OBS_ASOS_DD_1907_1909.csv")
+dat2 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\data\\OBS_ASOS_DD_1910_1919.csv")
+dat3 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\data\\OBS_ASOS_DD_1920_1929.csv")
+dat4 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\data\\OBS_ASOS_DD_1930_1939.csv")
+dat5 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\data\\OBS_ASOS_DD_1940_1949.csv")
+dat6 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\data\\OBS_ASOS_DD_1950_1959.csv")
+dat7 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\data\\OBS_ASOS_DD_1960_1969.csv")
+dat8 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\data\\OBS_ASOS_DD_1970_1979.csv")
+dat9 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\data\\OBS_ASOS_DD_1980_1984.csv")
+dat10 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\data\\OBS_ASOS_DD_1985_1989.csv")
+dat11 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\data\\OBS_ASOS_DD_1990_1994.csv")
+dat12 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\data\\OBS_ASOS_DD_1995_1999.csv")
+dat13 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\data\\OBS_ASOS_DD_2000_2004.csv")
+dat14 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\data\\OBS_ASOS_DD_2005_2009.csv")
+dat15 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\data\\OBS_ASOS_DD_2010_2014.csv")
+dat16 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\data\\OBS_ASOS_DD_2015_2021.csv")
 
 # dat : 1907~2021년도의 종관기상 관측 데이터
 dat <- rbind(dat1, dat2, dat3, dat4, dat5, dat6, dat7, dat8, dat9, dat10, dat11, dat12, dat13, dat14, dat15, dat16)
@@ -53,10 +53,6 @@ names(dat) <- c("point", "place", "date", "tempAvg", "tempLow", "tempLowTime",
 dat <- dat[,-which(names(dat) %in% c("place"))]
 # chr 형태의 변수 date를 date로 형 변환
 dat$date <- as.Date(dat$date)
-# tempLowTime과 tempHighTime이 1960-07-31 이전엔 측정되지 않아(기술의 문제로 추정) 1960-07-31 이전의 행 삭제 -> 너무 많은 행이 삭제되어 miss forest 같은 방법으로 결측치 대체 가능하지만, 이렇게 대체한다면 과거의 실제 tempLowTime과 tempHighTime이 현재의 tempLowTime과 tempHighTime과 달라도 분석 결과 비슷하게 보일 수 있음
-dat <- dat[!(dat$date <= "1960-07-31" ), ]
-# dewPointAvg가 1960-12-31 이전엔 측정되지 않아(기술의 문제로 추정) 1960-12-31 이전의 행 삭제
-dat <- dat[!(dat$date <= "1960-12-31" ), ]
 
 # 결측치 확인
 sapply(dat, function(x) sum(is.na(x)))
@@ -90,4 +86,5 @@ dat <- dat[,-which(names(dat) %in% c("windDir", "RHMinTime", "seaAPMaxTime", "se
 # 나머지 결측치가 있는 변수의 결측치를 mice로 대체
 mice_da <- mice(dat, method="rf")
 mice_dat <- complete(mice_da)
-sapply(mice_dat, function(x) sum(is.na(x)))
+
+dat_res <- write.csv(mice_dat, "C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\dat_res.csv")
