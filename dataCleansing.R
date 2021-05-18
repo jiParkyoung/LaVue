@@ -34,7 +34,7 @@ str(dat)
 # windMaxDir : 최대 풍속 풍향 16방위, windMaxTime : 최대 풍속 시각 hhmi, windAvg : 평균 풍속 ms, airDXSum : 풍정합 100m, windDir : 최다풍향 16방위, dewPointAvg : 평균 이슬점 온도 C,
 # RHMin : 최소 상대 습도, RHMinTime : 최소 상대 습도 시각 hhmi, RHAvg : 평균 상대습도, VPAvg : 평균 증기압 hPa, localAPAvg : 평균 현지 기압 hPa, seaAPMax : 최고 해면 기압 hPa, 
 # seaAPMaxTime : 최고 해면 기압 시각 hhmi, seaAPMin : 최저 해면 기압 hPa, seaAPMinTime : 최저 해면 기압 시각 hhmi, seaAPAvg : 평균 해면 기압 hPa, sunDuration : 가조시간, sunlightTimeSum : 합계 일조시각,
-# SRMaxHourTime : 1시간 최다 일사 시각, SRMaxHour : 1시간 최다 일사량, SRSum : 합계 일사량, snowDepthDaily : 일 최심신적설 cm, snowDepthDailyTime : 일 최심신적설 시각 hhmi, snowDepth :일 최심적설 cm, 
+# SRMaxHourTime : 1시간 최 SRMaxHour : 1시간 최다 일사다 일사 시각,량, SRSum : 합계 일사량, snowDepthDaily : 일 최심신적설 cm, snowDepthDailyTime : 일 최심신적설 시각 hhmi, snowDepth :일 최심적설 cm, 
 # snowDepthTime : 일 최심적설 시각 hhmi, snowDepthThreeSum : 3시간 신적설 합계 cm, warCloudAvg : 평균 전운량, cloudMidAvg : 평균 중하층운량, groundTempAvg : 평균 지면온도 C, grassTempMin : 최저 초상 온도 C, 
 # temp5Avg : 평균 5cm 지중온도 C, temp10Avg : 평균 10cm 지중온도 C, temp20Avg : 평균 20cm 지중온도 C, temp30Avg : 평균 30cm 지중온도 C, temp_5 : 0.5m 지중온도 C, temp1 : 1.0m 지중온도 C,
 # temp1_5 : 1.5m 지중온도 C, temp3 : 3.0m 지중온도 C, temp5 : 5.0m 지중온도 C, evapnLargeSum : 합계 대형 증발량 mm, evapnSmallSum : 합계 소형 증발량 mm, precip9_9 : 9.9 강수 mm, article : 기사, fogTime : 안개 계속 시간 hr
@@ -87,4 +87,23 @@ dat <- dat[,-which(names(dat) %in% c("windDir", "RHMinTime", "seaAPMaxTime", "se
 mice_da <- mice(dat, method="rf")
 mice_dat <- complete(mice_da)
 
-dat_res <- write.csv(mice_dat, "C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\dat_res.csv")
+mice_dat <- write.csv(mice_dat, "C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\dat_res.csv")
+
+df <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\dat_res.csv")
+
+# 다중공선성으로 인해 변수 제거
+df <- df[,-which(names(df) %in% c("article", "point", "precipHighHour", "precipHighHourTime", "snowDepthThreeSum", "temp20Avg", "temp1_5", "X"))]
+# 폭염 변수 추가(0 : 폭염 아님, 1 : 폭염임임)
+df[, "heatWave"] = 0
+df[(df$tempHigh>=33)&(shift(df$tempHigh, fill = df$tempHigh[1])>=33), "heatWave"] = 1
+
+# 데이터 슬라이싱
+train <- subset(df, substr(date,0,4) < 2017)
+test <- subset(df, substr(date,0,4) >= 2017)
+
+# date 변수 제거
+train <- train[, -which(names(train) %in% c("date"))]
+test <- test[, -which(names(test) %in% c("date"))]
+
+train <- write.csv(train, "C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\dat_train.csv")
+test <- write.csv(test, "C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\dat_test.csv")
