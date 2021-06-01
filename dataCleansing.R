@@ -4,6 +4,7 @@ library(dplyr)
 library(mice)
 library(DMwR)
 library(randomForest)
+library(missForest)
 
 # 데이터 불러오기
 dat1 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\data\\OBS_ASOS_DD_1907_1909.csv")
@@ -49,8 +50,6 @@ names(dat) <- c("point", "place", "date", "tempAvg", "tempLow", "tempLowTime",
                 "temp5Avg", "temp10Avg", "temp20Avg", "temp30Avg", "temp_5", "temp1",
                 "temp1_5", "temp3", "temp5", "evapnLargeSum", "evapnSmallSum", "precip9_9", "article", "fogTime")
 
-# chr 형태의 변수 place는 point에서 값을 확인할 수 있기 때문에 삭제(116:관악산, 108:서울)
-dat <- dat[,-which(names(dat) %in% c("place"))]
 # chr 형태의 변수 date를 date로 형 변환
 dat$date <- as.Date(dat$date)
 
@@ -58,52 +57,90 @@ dat$date <- as.Date(dat$date)
 sapply(dat, function(x) sum(is.na(x)))
 md.pattern(dat)
 
-# 0으로 대체 가능한 precipTime, precipHighMin, precipHighMinTime, precipHighHour, precipHighHourTime, precipDate, snowDepthDaily, snowDepthDailyTime, snowDepth, snowDepthTime, snowDepthThreeSum, fogTime의 결측치는 0으로 대체
-dat$precipTime[is.na(dat$precipTime)] <- 0
-dat$precipHighMin[is.na(dat$precipHighMin)] <- 0
-dat$precipHighMinTime[is.na(dat$precipHighMinTime)] <- 0
-dat$precipHighHour[is.na(dat$precipHighHour)] <- 0
-dat$precipHighHourTime[is.na(dat$precipHighHourTime)] <- 0
-dat$precipDate[is.na(dat$precipDate)] <- 0
-dat$snowDepthDaily[is.na(dat$snowDepthDaily)] <- 0
-dat$snowDepthDailyTime[is.na(dat$snowDepthDailyTime)] <- 0
-dat$snowDepth[is.na(dat$snowDepth)] <- 0
-dat$snowDepthTime[is.na(dat$snowDepthTime)] <- 0
-dat$snowDepthThreeSum[is.na(dat$snowDepthThreeSum)] <- 0
-dat$fogTime[is.na(dat$fogTime)] <- 0
+# 데이터 저장
+save_dat_before_dataCleansing <- write.csv(dat, "C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\dat_before_dataCleansing.csv")
 
-# 결측치가 0.5% 이하인(124개 이하) 변수의 결측치를 knn으로 대체
-knn_dat <- knnImputation(dat[,which(names(dat) %in% c("tempLow", "tempLowTime", "tempHigh", "tempHighTime", "windMaxInstant", "windMaxInstantDir", "windMaxInstantTime", "windMax", "windMaxDir", "windMaxTime", "windAvg", "RHMin", "LocalAPAvg"))],k=10)
-dat <- dat[,-which(names(dat) %in% c("tempLow", "tempLowTime", "tempHigh", "tempHighTime", "windMaxInstant", "windMaxInstantDir", "windMaxInstantTime", "windMax", "windMaxDir", "windMaxTime", "windAvg", "RHMin", "LocalAPAvg"))]
-dat <- cbind(dat, knn_dat)
+#결측치가 10000개 이상인 변수와 chr형태의 변수와 쓸모없는 변수 제거
+dat <- dat[,-which(names(dat) %in% c("tempLowTime", "tempHighTime", "precipTime", "precipHighMin", "precipHighMinTime", "precipHighHour", "precipHighHourTime", "precipDate", "windMaxInstant", "windMaxInstantTime", "windMaxTime", "windDir", "dewPointAvg", "RHMinTime", "seaAPMax", "seaAPMaxTime", "seaAPMin", "seaAPMinTime", "sunDuration", "SRMaxHourTime", "SRMaxHour", "SRSum", "snowDepthDaily", "snowDepthDailyTime", "snowDepth", "snowDepthTime", "snowDepthThreeSum", "cloudMidAvg", "temp3", "temp5", "evapnLargeSum", "precip9_9", "article", "point", "place", "fogTime"))]
 
-#결측치가 30% 이상인(7432개 이상) 변수 제거
-dat <- dat[,-which(names(dat) %in% c("SRMaxHourTime", "SRMaxHour", "evapnLargeSum", "precip9_9"))]
+# 결측치 존재하는 행 삭제
+dat_for_imp <- na.omit(dat) # 43383 -> 30635
 
-# 결측치가 특정 기간 전에 측정되지 않은(기술의 문제로 추정) 변수 제거
-dat <- dat[,-which(names(dat) %in% c("windDir", "RHMinTime", "seaAPMaxTime", "seaAPMinTime", "SRSum", "cloudMidAvg"))]
+# 데이터복구를 위한 원데이터
+original <- dat_for_imp
+sapply(original, function(x) sum(is.na(x)))
 
-# 나머지 결측치가 있는 변수의 결측치를 mice로 대체
-mice_da <- mice(dat, method="rf")
-mice_dat <- complete(mice_da)
+# 결측값이 있는 변수에 결측 데이터 생성
+# dat[sample(1:nrow(dat), 500), "tempAvg"] <- NA
+# dat[sample(1:nrow(dat), 500), "tempLow"] <- NA
+# dat[sample(1:nrow(dat), 500), "tempHigh"] <- NA
+# dat[sample(1:nrow(dat), 500), "windMaxInstantDir"] <- NA
+# dat[sample(1:nrow(dat), 500), "windMax"] <- NA
+# dat[sample(1:nrow(dat), 500), "windMaxDir"] <- NA
+# dat[sample(1:nrow(dat), 500), "windAvg"] <- NA
+# dat[sample(1:nrow(dat), 500), "airDXSum"] <- NA
+# dat[sample(1:nrow(dat), 500), "RHMin"] <- NA
+# dat[sample(1:nrow(dat), 500), "RHAvg"] <- NA
+# dat[sample(1:nrow(dat), 500), "VPAvg"] <- NA
+# dat[sample(1:nrow(dat), 500), "LocalAPAvg"] <- NA
+# dat[sample(1:nrow(dat), 500), "seaAPAvg"] <- NA
+# dat[sample(1:nrow(dat), 500), "sunlightTimeSum"] <- NA
+# dat[sample(1:nrow(dat), 500), "warCloudAvg"] <- NA
+# dat[sample(1:nrow(dat), 500), "groundTempAvg"] <- NA
+# dat[sample(1:nrow(dat), 500), "grassTempMin"] <- NA
+# dat[sample(1:nrow(dat), 500), "temp5Avg"] <- NA
+# dat[sample(1:nrow(dat), 500), "temp10Avg"] <- NA
+# dat[sample(1:nrow(dat), 500), "temp20Avg"] <- NA
+# dat[sample(1:nrow(dat), 500), "temp30Avg"] <- NA
+# dat[sample(1:nrow(dat), 500), "temp_5"] <- NA
+# dat[sample(1:nrow(dat), 500), "temp1"] <- NA
+# dat[sample(1:nrow(dat), 500), "temp1_5"] <- NA
+# dat[sample(1:nrow(dat), 500), "evapnSmallSum"] <- NA
+dat_colname <- colnames(dat_for_imp[,!names(dat_for_imp) %in% c("date")])
+for(col in dat_colname) {
+  dat_for_imp[sample(1:nrow(dat_for_imp), 500), col] <- NA
+}
+sapply(dat_for_imp, function(x) sum(is.na(x)))
 
-mice_dat <- write.csv(mice_dat, "C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\dat_res.csv")
+# knn으로 결측치 대체
+da_knn <- knnImputation(dat_for_imp[, !names(dat_for_imp) %in% "date"])
+sapply(da_knn, function(x) sum(is.na(x)))
 
-df <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\dat_res.csv")
+# knn 결측치 대체 mae, mse, rmse, mape
+accuracy_knn <- 0
+for (col in dat_colname) {
+  actuals_knn <- original$col[is.na(dat_for_imp$col)]
+  predicts_knn <- da_knn$col[is.na(dat_for_imp$col)]
+  accuracy_knn <- accuracy_knn + regr.eval(actuals_knn, predicts_knn)
+}
+accuracy_knn <- accuracy_knn / length(dat_colname)
+accuracy_knn
 
-# 다중공선성으로 인해 변수 제거
-df <- df[,-which(names(df) %in% c("article", "point", "precipHighHour", "precipHighHourTime", "snowDepthThreeSum", "temp20Avg", "temp1_5", "X"))]
-# 폭염 변수 추가(0 : 폭염 아님, 1 : 폭염임임)
-df[, "heatWave"] = 0
-df[(df$tempHigh>=33)&(shift(df$tempHigh, fill = df$tempHigh[1])>=33), "heatWave"] = 1
+# 결측치를 mice로 대체
+da_mice <- mice(dat_for_imp, method="rf")
+dat_mice <- complete(da_mice)
+sapply(dat_mice, function(x) sum(is.na(x)))
 
-# 데이터 슬라이싱
-train <- subset(df, substr(date,0,4) < 2017)
-test <- subset(df, substr(date,0,4) >= 2017)
+# mice 결측치 대체 mae, mse, rmse, mape
+accuracy_mice <- 0
+for (col in dat_colname) {
+  actuals_mice <- original$col[is.na(dat_for_imp$col)]
+  predicts_mice <- dat_mice$col[is.na(dat_for_imp$col)]
+  accuracy_mice <- accuracy_mice + regr.eval(actuals_mice, predicts_mice)
+}
+accuracy_mice <- accuracy_mice / length(dat_colname)
+accuracy_mice
 
-# date 변수 제거
-train <- train[, -which(names(train) %in% c("date"))]
-test <- test[, -which(names(test) %in% c("date"))]
+# 결측치를 miss forest로 대체
+da_missforest <- missForest(dat_for_imp[, !names(dat_for_imp) %in% "date"])
+dat_missforest <- da_missforest$ximp
 
-train <- write.csv(train, "C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\dat_train.csv")
-test <- write.csv(test, "C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\dat_test.csv")
+# miss forest 결측치 대체 mae, mse, rmse, mape
+accuracy_missforest <- 0
+for (i in dat_colname) {
+  actuals_missforest <- original$i[is.na(dat_for_imp$i)]
+  predicts_missforest <- dat_missforest[is.na(dat_for_imp$i), i]
+  accuracy_missforest <- accuracy_missforest + regr.eval(actuals_missforest, predicts_missforest)
+}
+accuracy_missforest <- accuracy_missforest / length(dat_colname)
+accuracy_missforest
