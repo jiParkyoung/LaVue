@@ -58,7 +58,7 @@ Orange %>%
   )
 
 fig <- plot_ly() 
-fig <- fig %>% add_trace(x=0:30, y=test_rlog[2:32,2], color = 'red', mode = "lines") 
-fig <- fig %>% add_trace(x=0:30, y=predtemphigh[2:32], color = 'blue', mode = "lines")
+fig <- fig %>% layout(title='선형회귀모델', yaxis=list(title='최고기온'), sizes=c(380,150))
+fig <- fig %>% add_trace(x=0:30, y=test_rlog[2:32,2], color='실제값', mode = "lines") 
+fig <- fig %>% add_trace(x=0:30, y=predtemphigh[2:32], color='예측값', mode = "lines")
 fig
-install.packages("rmarkdown") 
