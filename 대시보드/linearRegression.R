@@ -1,5 +1,5 @@
 # 데이터 불러오기
-data_mice <- read.csv("C:/Users/eourm/Desktop/융합팀플/LaVue-main/LaVue-main/mice_df_robust.csv")
+data_mice <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\mice_df_robust.csv")
 str(data_mice)
 dat_mice<- data_mice[,-c(1)] 
 dat_mice$date <- as.Date(dat_mice$date)
@@ -42,5 +42,23 @@ summary(robustLog_model)
 
 #모델평가 테스트
 predtemphigh <- predict(robustLog_model,test_rlog[-1])
-plot(test_rlog[2:32,2], type = 'o', col = 'red')#실제 최고기온
-lines(predtemphigh[2:32], type = 'o', col = 'blue')#다음날 최고기온
+y<- plot(test_rlog[2:32,2], type = 'o', col = 'red') + lines(predtemphigh[2:32], type = 'o', col = 'blue')
+
+library(plotly)
+library(rmarkdown)
+library(dplyr)
+
+Orange %>% 
+  plot_ly() %>% 
+  add_trace(x=0:30, y=test_rlog[2:32,2], color = 'red', mode = "lines")
+  add_trace(x=0:30, y=predtemphigh[2:32], color = 'blue', mode = "lines") %>% 
+  layout(
+    title = "선형회귀",
+    yaxis = list(title = "최고기온")
+  )
+
+fig <- plot_ly() 
+fig <- fig %>% add_trace(x=0:30, y=test_rlog[2:32,2], color = 'red', mode = "lines") 
+fig <- fig %>% add_trace(x=0:30, y=predtemphigh[2:32], color = 'blue', mode = "lines")
+fig
+install.packages("rmarkdown") 
