@@ -6,6 +6,13 @@ library(DMwR)
 library(randomForest)
 library(missForest)
 
+install.packages("ggplot2")
+install.packages("dplyr")
+install.packages("mice")
+install.packages("DMwR")
+install.packages("randomForest")
+install.packages("missForest")
+
 # 데이터 불러오기
 dat1 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\data\\OBS_ASOS_DD_1907_1909.csv")
 dat2 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\data\\OBS_ASOS_DD_1910_1919.csv")

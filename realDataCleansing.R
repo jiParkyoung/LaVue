@@ -23,9 +23,10 @@ dat13 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\data\\OBS_ASOS_DD_200
 dat14 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\data\\OBS_ASOS_DD_2005_2009.csv")
 dat15 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\data\\OBS_ASOS_DD_2010_2014.csv")
 dat16 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\data\\OBS_ASOS_DD_2015_2021.csv")
+dat17 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\data\\OBS_ASOS_DD_2021_6.csv")
 
 # dat : 1907~2021년도의 종관기상 관측 데이터
-dat <- rbind(dat1, dat2, dat3, dat4, dat5, dat6, dat7, dat8, dat9, dat10, dat11, dat12, dat13, dat14, dat15, dat16)
+dat <- rbind(dat1, dat2, dat3, dat4, dat5, dat6, dat7, dat8, dat9, dat10, dat11, dat12, dat13, dat14, dat15, dat16, dat17)
 str(dat)
 
 # 변수명 변경
@@ -63,9 +64,6 @@ save_dat_before_dataCleansing <- write.csv(dat, "C:\\Users\\jessy\\Desktop\\팀플
 #결측치가 10000개 이상인 변수와 chr형태의 변수와 쓸모없는 변수 제거
 dat <- dat[,-which(names(dat) %in% c("tempLowTime", "tempHighTime", "precipTime", "precipHighMin", "precipHighMinTime", "precipHighHour", "precipHighHourTime", "precipDate", "windMaxInstant", "windMaxInstantTime", "windMaxTime", "windDir", "dewPointAvg", "RHMinTime", "seaAPMax", "seaAPMaxTime", "seaAPMin", "seaAPMinTime", "sunDuration", "SRMaxHourTime", "SRMaxHour", "SRSum", "snowDepthDaily", "snowDepthDailyTime", "snowDepth", "snowDepthTime", "snowDepthThreeSum", "cloudMidAvg", "temp3", "temp5", "evapnLargeSum", "precip9_9", "article", "point", "place", "fogTime"))]
 
-# knn으로 결측치 대체 : 오류(첫번째 값이 없는 변수들로 인해)
-da_knn <- knnImputation(dat[, !names(dat) %in% "date"])
-
 # 결측치를 mice로 대체
 da_mice <- mice(dat, method="rf")
 dat_mice <- complete(da_mice)
@@ -77,31 +75,3 @@ dat_mice[(dat_mice$tempHigh>=33)&(shift(dat_mice$tempHigh, fill = dat_mice$tempH
 
 # mice로 결측치 대체한 데이터 저장
 save_dat_mice <- write.csv(dat_mice, "C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\dat_mice.csv")
-
-# 결측치를 miss forest로 대체
-da_missforest <- missForest(dat[, !names(dat) %in% "date"])
-dat_missforest <-da_missforest$ximp
-sapply(dat_missforest, function(x) sum(is.na(x)))
-
-# 폭염 변수 추가(0 : 폭염 아님, 1 : 폭염임임)
-dat_missforest[, "heatWave"] = 0
-dat_missforest[(da_missforest$tempHigh>=33)&(shift(da_missforest$tempHigh, fill = da_missforest$tempHigh[1])>=33), "heatWave"] = 1
-
-# miss forest로 결측치 대체한 데이터 저장
-save_dat_missforest <- write.csv(dat_missforest, "C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\dat_missforest.csv")
-
-# 데이터 슬라이싱 - mice
-# train <- subset(dat_mice, substr(date,0,4) < 2017)
-# test <- subset(dat_mice, substr(date,0,4) >= 2017)
-train_mice <- subset(dat_mice, format(date,'%Y') < 2017)
-test_mice <- subset(dat_mice, format(date,'%Y') >= 2017)
-
-save_train_mice <- write.csv(train_mice, "C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\dat_train_mice.csv")
-save_test_mice <- write.csv(test_mice, "C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\dat_test_mice.csv")
-
-# 데이터 슬라이싱 - miss forest
-train_missforest <- subset(dat_missforest, format(date,'%Y') < 2017)
-test_missforest <- subset(dat_missforest, format(date,'%Y') >= 2017)
-
-save_train_missforest <- write.csv(train_missforest, "C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\dat_train_missforest.csv")
-save_test_missforest <- write.csv(test_missforest, "C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\dat_test_missforest.csv")
