@@ -136,12 +136,6 @@ predtemphigh <- predict.lm(model_fwd3,newdata = test[-1])
 plot(test[1:32,1], type = 'o', col = 'red')#실제 최고기온
 lines(predtemphigh[1:32], type = 'o', col = 'blue')#다음날 최고기온
 
-predtemphigh <- predict.lm(model_fwd3,newdata = train[-1])
-plot(train[1:32,1], type = 'o', col = 'red')#실제 최고기온
-lines(predtemphigh[1:32], type = 'o', col = 'blue')#다음날 최고기온
-
-train['pred_to_tempHigh'] <- predict(model_fwd3, train[-1])
-
 
 #다중공선성
 library("car")
