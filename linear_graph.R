@@ -34,19 +34,6 @@ fig <- fig %>% add_lines(x=test[0:188,'date'], y=33, color="폭염기준")
 fig <- fig %>% add_lines(x=test[182,'date'], y=c(min(unlist(fig_y)),max(unlist(fig_y))), color="2017년7월1일")
 fig
 
-
-# 2017년 1월~6월 + 7일
-fig_y <- as.list(df_pred[0:182,2])
-fig_y <- append(fig_y, df_pred[182,3]); fig_y <- append(fig_y, df_pred[182,4]); fig_y <- append(fig_y, df_pred[182,5]); fig_y <- append(fig_y, df_pred[182,6]); fig_y <- append(fig_y, df_pred[182,7]); fig_y <- append(fig_y, df_pred[182,8])
-fig <- plot_ly() 
-fig <- fig %>% layout(title='2017년 1월~6월 선형회귀모델', yaxis=list(title='최고기온'), sizes=c(380,150))
-fig <- fig %>% add_trace(x=test[0:188,'date'], y=test[0:188,'tempHighReal'], color='실제값', mode = "lines") 
-fig <- fig %>% add_trace(x=df_pred[0:188,'date'], y=fig_y, color='예측값', mode = "lines")
-fig <- fig %>% add_lines(x=test[0:188,'date'], y=33, color="폭염기준")
-fig <- fig %>% add_lines(x=test[182,'date'], y=c(min(unlist(fig_y)),max(unlist(fig_y))), color="2017년7월1일")
-fig
-
-
 # 2017년 6월~12월 + 7일
 fig_y <- as.list(df_pred[182:366,2])
 fig_y <- append(fig_y, df_pred[367,3]); fig_y <- append(fig_y, df_pred[368,4]); fig_y <- append(fig_y, df_pred[369,5]); fig_y <- append(fig_y, df_pred[370,6]); fig_y <- append(fig_y, df_pred[371,7]); fig_y <- append(fig_y, df_pred[372,8])
@@ -125,25 +112,23 @@ fig <- fig %>% add_lines(x=test[1462,'date'], y=c(min(unlist(fig_y)),max(unlist(
 fig
 
 # 2021년 1월~6월 + 7일
-fig_y1 <- as.list(test[1462:1581,'tempHighReal'])
-for (i in 1:6) {
-  fig_y1 <- append(fig_y1, test[1581,'tempHighReal'])
-}
-fig_y2 <- as.list(df_pred[1462:1581,2])
-fig_y2 <- append(fig_y2, df_pred[1581,3]); fig_y2 <- append(fig_y2, df_pred[1581,4]); fig_y2 <- append(fig_y2, df_pred[1581,5]); fig_y2 <- append(fig_y2, df_pred[1581,6]); fig_y2 <- append(fig_y2, df_pred[1581,7]); fig_y2 <- append(fig_y2, df_pred[1581,8])
+fig_y1 <- as.list(test[1462:1612,'tempHighReal'])
+fig_y2 <- as.list(df_pred[1462:1612,2])
+fig_y2 <- append(fig_y2, df_pred[1612,3]); fig_y2 <- append(fig_y2, df_pred[1612,4]); fig_y2 <- append(fig_y2, df_pred[1612,5]); fig_y2 <- append(fig_y2, df_pred[1612,6]); fig_y2 <- append(fig_y2, df_pred[1612,7]); fig_y2 <- append(fig_y2, df_pred[1612,8])
 
-test[1462,'date']
-fig_x <-  as.list(test[1462:1581,'date'])
-date1 <- test[1581,'date']+1; date2 <- test[1581,'date']+2; date3 <- test[1581,'date']+3; date4 <- test[1581,'date']+4; date5 <- test[1581,'date']+5; date6 <- test[1581,'date']+6;
-date1 <- as.Date(date1); date2 <- as.Date(date2); date3 <- as.Date(date3); date4 <- as.Date(date4); date5 <- as.Date(date5); date6 <- as.Date(date6)
-fig_x <- append(fig_x, date1); fig_x <- append(fig_x, date2); fig_x <- append(fig_x, date3); fig_x <- append(fig_x, date4); fig_x <- append(fig_x, date5); fig_x <- append(fig_x, date6);
-print(typeof(date1))
+# fig_x <-  as.list(test[1462:1581,'date'])
+# date1 <- test[1581,'date']+1; date2 <- test[1581,'date']+2; date3 <- test[1581,'date']+3; date4 <- test[1581,'date']+4; date5 <- test[1581,'date']+5; date6 <- test[1581,'date']+6;
+# date1 <- as.Date(date1); date2 <- as.Date(date2); date3 <- as.Date(date3); date4 <- as.Date(date4); date5 <- as.Date(date5); date6 <- as.Date(date6)
+# fig_x <- append(fig_x, date1); fig_x <- append(fig_x, date2); fig_x <- append(fig_x, date3); fig_x <- append(fig_x, date4); fig_x <- append(fig_x, date5); fig_x <- append(fig_x, date6);
 
+fig_x1 <- format(seq(as.Date("2021-01-01"), as.Date("2021-06-07"), by="days"), format="%m-%d-%Y")
+fig_x2 <- format(seq(as.Date("2021-01-01"), as.Date("2021-05-31"), by="days"), format="%m-%d-%Y")
 
+fig_x1[152]
 fig <- plot_ly() 
 fig <- fig %>% layout(title='2021년 1월~6월 선형회귀모델', yaxis=list(title='최고기온'), sizes=c(380,150))
-fig <- fig %>% add_trace(x=fig_x, y=fig_y1, color='실제값', mode = "lines") 
-fig <- fig %>% add_trace(x=fig_x, y=fig_y2, color='예측값', mode = "lines")
-fig <- fig %>% add_lines(x=fig_x, y=33, color="폭염기준")
-fig <- fig %>% add_lines(x=as.Date("2021-05-01"), y=c(min(unlist(fig_y2)),max(unlist(fig_y2))), color="2021년5월1일")
+fig <- fig %>% add_lines(x=fig_x2, y=fig_y1, color='실제값', mode = "lines")
+fig <- fig %>% add_lines(x=fig_x1, y=fig_y2, color='예측값', mode = "lines")
+fig <- fig %>% add_lines(x=fig_x1, y=33, color="폭염기준")
+fig <- fig %>% add_lines(x=fig_x1[152], y=c(min(unlist(fig_y2)),max(unlist(fig_y2))), color="2021년6월1일")
 fig

@@ -1,6 +1,6 @@
 
 # 데이터 불러오기
-ro_data_mice7 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\선형회귀\\mice_df_robust7.csv")
+ro_data_mice7 <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\mice_df_robust7.csv")
 str(ro_data_mice7)
 ro_data_mice7$date <- as.Date(ro_data_mice7$date)
 

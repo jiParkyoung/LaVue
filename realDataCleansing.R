@@ -69,9 +69,5 @@ da_mice <- mice(dat, method="rf")
 dat_mice <- complete(da_mice)
 sapply(dat_mice, function(x) sum(is.na(x)))
 
-# 폭염 변수 추가(0 : 폭염 아님, 1 : 폭염임임)
-dat_mice[, "heatWave"] = 0
-dat_mice[(dat_mice$tempHigh>=33)&(shift(dat_mice$tempHigh, fill = dat_mice$tempHigh[1])>=33), "heatWave"] = 1
-
 # mice로 결측치 대체한 데이터 저장
 save_dat_mice <- write.csv(dat_mice, "C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\dat_mice.csv")

@@ -1,6 +1,6 @@
 
 # 데이터 불러오기
-ro_data_mice <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\선형회귀\\mice_df_robust1.csv")
+ro_data_mice <- read.csv("C:\\Users\\jessy\\Desktop\\팀플\\LaVue\\mice_df_robust1.csv")
 #data_mice <- read.csv("C:/Users/eourm/Desktop/융합팀플/LaVue-main/LaVue-main/dat_mice.csv")
 str(ro_data_mice)
 ro_dat_mice<- ro_data_mice
