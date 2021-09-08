@@ -133,7 +133,7 @@ str(train)
 
 #모델평가 테스트
 predtemphigh <- predict.lm(model_fwd3,newdata = test[-1])
-plot(test[1:32,1], type = 'o', col = 'red')#실제 최고기온
+plot(test[1:32,2], type = 'o', col = 'red')#실제 최고기온
 lines(predtemphigh[1:32], type = 'o', col = 'blue')#다음날 최고기온
 
 

@@ -119,8 +119,8 @@ test3 <- test3[,c('to_tempHigh3','tempHigh' , 'sunlightTimeSum','temp5Avg','wind
 
 #모델평가 테스트
 predtemphigh <- predict(model_fwd3_d3,test3[-1])
-plot(test3[2:32,2], type = 'o', col = 'red')#실제 최고기온
-lines(predtemphigh[2:32], type = 'o', col = 'blue')#다음날 최고기온
+plot(test3[1:32,2], type = 'o', col = 'red')#실제 최고기온
+lines(predtemphigh[1:32], type = 'o', col = 'blue')#다음날 최고기온
 
 #잔차분석
 par(mfrow=c(2,2))

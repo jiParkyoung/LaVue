@@ -111,8 +111,8 @@ test2 <- test2[,c('to_tempHigh2','tempHigh' , 'sunlightTimeSum','temp5Avg','wind
 
 #모델평가 테스트
 predtemphigh <- predict(model_fwd3_d2,test2[-1])
-plot(test2[2:32,1], type = 'o', col = 'red')#실제 최고기온
-lines(predtemphigh[2:32], type = 'o', col = 'blue')#다음날 최고기온
+plot(test2[1:32,2], type = 'o', col = 'red')#실제 최고기온
+lines(predtemphigh[1:32], type = 'o', col = 'blue')#다음날 최고기온
 
 
 
